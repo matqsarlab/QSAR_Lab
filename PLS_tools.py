@@ -3,7 +3,13 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # Latent vectors plot
-def latent_vectors(model, X_train, n_comp, *args):
+def latent_vectors(model, X_train, n_comp, *args, **kwargs):
+
+    if "color" in kwargs:
+        color_ = kwargs["color"]
+    else:
+        color_ = "#95d5b2"
+
 
     """ Skladowe LV """
     latent_no = []
@@ -19,7 +25,7 @@ def latent_vectors(model, X_train, n_comp, *args):
     for x in range(0, len(loadings.columns)):
         for y in loadings.iloc[:, x]:
             if (y >= 0.5) or (y <= -0.5):
-                col.append('#95d5b2')
+                col.append(color_)
             else:
                 col.append('#C2CCD0')
     col2 = np.asarray(col)
