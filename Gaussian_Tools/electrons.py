@@ -4,7 +4,7 @@ import sys
 
 filelist = sys.argv[1:]
 
-atomic_num = {"C":6, "O":8, "H":1, "N":7}
+atomic_num = {"C":6, "O":8, "H":1, "N":7, "S":16}
 
 class Electrons:
     
