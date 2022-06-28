@@ -1,6 +1,7 @@
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
+
 
 # Latent vectors plot
 def latent_vectors(model, X_train, n_comp, *args, **kwargs):
@@ -56,7 +57,7 @@ def latent_vectors(model, X_train, n_comp, *args, **kwargs):
         plt.title('LV'+ str(x+1), fontsize=22)
 
     plt.tight_layout()
-    plt.show()
+    # plt.show()
 
 # Distribution elements in LV dimnesion
 def distribution_in_LVs(model, X_train, y_train, X_test, y_test, n_comp, **kwargs):
@@ -142,5 +143,4 @@ def distribution_in_LVs(model, X_train, y_train, X_test, y_test, n_comp, **kwarg
     cbar.draw_all()
 
     plt.tight_layout()
-    plt.show()
-
+    # plt.show()

@@ -1,7 +1,8 @@
+import matplotlib.pyplot as plt
 import numpy as np
 from numpy.linalg import matrix_power
 from sklearn.preprocessing import StandardScaler
-import matplotlib.pyplot as plt
+
 
 def Williams_plot(X_train, X_test,y_train, y_test, y_train_pred, y_test_pred):
     """Aplicability Domain"""
@@ -31,7 +32,7 @@ def Williams_plot(X_train, X_test,y_train, y_test, y_train_pred, y_test_pred):
     scaler3 = StandardScaler()
     r = res.reshape(-1, 1)
     st_res = scaler3.fit_transform(r)
-    h_k = (3 * len(Xt.columns))/len(Xt.index)
+    h_k = (3 * (len(Xt.columns) + 1))/len(Xt.index)
     print("h_k =", h_k)
     """Train"""
 

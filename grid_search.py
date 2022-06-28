@@ -1,13 +1,14 @@
 import itertools
 import time
-import pandas as pd
+
 import numpy as np
-from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import r2_score
-from sklearn.model_selection import cross_val_predict
+import pandas as pd
 from QSAR_Lab.smogn_maker import synth_smoth
 from QSAR_Lab.spliter import split_x_to_n
 from sklearn.ensemble import AdaBoostRegressor
+from sklearn.metrics import r2_score
+from sklearn.model_selection import cross_val_predict
+from sklearn.preprocessing import StandardScaler
 
 
 def adbr():
@@ -157,7 +158,7 @@ class Modeling:
                 cv_train_r2 = r2_score(y_train, cv_train)
 
                 # Model score
-                if r2_train > -0.6 and r2_train <= 0.99 and r2_test > -0.6 and cv_train_r2 >  -0.5:
+                if r2_train > 0.6 and r2_train <= 0.99 and r2_test > 0.7:# and cv_train_r2 >  -0.5:
 
                     r2_train_.append(r2_train)
                     r2_test_.append(r2_test)
@@ -354,5 +355,3 @@ class Modeling_with_SMOGN:
 
         self.table = d.copy()
         return d
-
-
