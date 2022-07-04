@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-import sys
+import argparse
+import os
 
 
 class Read:
@@ -17,7 +18,7 @@ class Read:
                 yield i
 
     @property
-    def standar_orientation(self):
+    def standard_orientation(self):
 
         xyz = []
         x = self.gen
@@ -44,7 +45,7 @@ class Read:
 
         uklad = {"6":"C", "8":"O", "1":"H", "16":"S","7":"N"}
 
-        so = self.standar_orientation
+        so = self.standard_orientation
         new_coor = []
         step = 0
         time = 0
@@ -69,18 +70,40 @@ class Read:
 
 
 
-try:
-    fname = sys.argv[1]
-except:
-    print("Can't find an argument (Gaussian log file).")
-else:
-    ins = Read(fname)
-    ins.standar_orientation
-    x = ins.make_xyz
+parser = argparse.ArgumentParser()
+parser.add_argument('filename', nargs='+')
+parser.add_argument('-x', action='store_true')
 
-    for i in x:
-        print(i)
-    # x = ins.standar_orientation
-    # for i in x:
-    #     print(i)
-    # print(ins.make_xyz)
+options = parser.parse_args()
+
+if options.x:
+
+    fc = "Final_Trajectories"
+
+    if not os.path.isdir(fc):
+        os.mkdir(fc)
+
+    for i in options.filename:
+        ins = Read(i)
+        ins.standard_orientation
+
+        x = ins.make_xyz
+        s = i.replace(".log", ".xyz")
+
+        with open(os.path.join(fc, s), "w") as f:
+            for line in x:
+                f.write(str(line)+"\n")
+
+else:
+    try:
+        fname = options.filename[0]
+        # fname = sys.argv[1]
+    except:
+        print("Can't find an argument (Gaussian log file).")
+    else:
+        ins = Read(fname)
+        ins.standard_orientation
+        x = ins.make_xyz
+
+        for i in x:
+            print(i)
