@@ -88,12 +88,17 @@ if options.x:
         ins.standard_orientation
 
         x = ins.make_xyz
-        s = i.replace(".log", ".xyz")
+
+        if "/" in i:
+            s = i.split("/")[-1]
+            s = s.replace(".log", ".xyz")
+
+        else:
+            s = i.replace(".log", ".xyz")
 
         with open(os.path.join(fc, s), "w") as f:
             for line in x:
                 f.write(str(line)+"\n")
-
 else:
     try:
         fname = options.filename[0]
