@@ -59,7 +59,6 @@ class NM_translate:
     @property
     def vec_direct(self):
         mmin = np.min(self.translate_center_to_zero, axis=0)
-        print("v z NM_translate", np.array([0, mmin[1], 0]))
         return np.array([0, mmin[1], 0])
 
 
@@ -74,8 +73,6 @@ class AA_add_transpose(NM_translate):
         super().__init__(self.object2)
         new_xyz_obj2 = super().translate_center_to_zero
         u = super().max_dist["coordinate"]
-        print("main_dist", super().max_dist["distance_from_center"])
-        print(super().max_dist)
         angle = np.arccos((u @ v) / (np.linalg.norm(u) * np.linalg.norm(v)))
         axis = np.cross(u, v) / np.linalg.norm(np.cross(u, v))
         q = np.append(np.cos(angle / 2), np.sin(angle / 2) * axis)
