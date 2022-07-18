@@ -58,6 +58,13 @@ if options.all:
                     f.write(
                         "{}{:>20}{:>13}{:>13}\n".format(n, coor[0], coor[1], coor[2])
                     )
+
+            with open(os.path.join(dir, sub_dir1, sub_dir2, "atom_info"), "w") as f:
+                f.write(sub_dir1 + f"= 1 - {len(xyz_obj1)}\n")
+                f.write(
+                    sub_dir2 + f"= {1+len(xyz_obj1)} - {len(xyz_obj1)+len(xyz_obj2)}\n"
+                )
+                pass
 else:
     try:
         fname1 = options.f1[0]
