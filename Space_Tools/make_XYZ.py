@@ -3,6 +3,7 @@ import argparse
 import os
 
 import numpy as np
+
 from QSAR_Lab.Space_Tools.Align_two_3D_object import (AA_add_transpose,
                                                       NM_translate)
 
@@ -12,7 +13,6 @@ parser.add_argument("--f2", nargs="+")
 parser.add_argument("-all", action="store_true")
 
 options = parser.parse_args()
-zero = [0, 0, 0]
 
 if options.all:
 
