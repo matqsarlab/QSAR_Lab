@@ -48,7 +48,8 @@ def create_XYZ(lock=False):
             up = dft_info[:idx]
             down = dft_info[1 + idx :]
 
-            up[0] = up[0].replace("\n", f"{n1}_{n2}\n")
+            idx_chk = [i for i, item in enumerate(up) if "%chk" in item][0]
+            up[idx_chk] = up[idx_chk].replace("\n", f"{n1}_{n2}\n")
             charge = up[-1][0]
 
             idx_dft = [i for i, item in enumerate(down) if re.search("^[***]", item)]
