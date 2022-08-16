@@ -5,11 +5,9 @@ import os
 
 
 class Read:
-
     def __init__(self, filename) -> None:
         self.filename = filename
         self.counter = 0
-        
 
     @property
     def gen(self):
@@ -43,7 +41,16 @@ class Read:
     @property
     def make_xyz(self):
 
-        uklad = {"6":"C", "8":"O", "1":"H", "16":"S","7":"N"}
+        uklad = {
+            "6": "C",
+            "8": "O",
+            "1": "H",
+            "16": "S",
+            "7": "N",
+            "14": "Si",
+            "47": "Ag",
+            "79": "Au",
+        }
 
         so = self.standard_orientation
         new_coor = []
@@ -60,19 +67,19 @@ class Read:
                 time += 2
 
             if s[1] in uklad.keys():
-                xxx = list(uklad[s[1]]) + s[3:]
+                xxx = [uklad[s[1]]] + s[3:]
 
                 # new_coor.append(f'{xxx[0]}      {xxx[1]}   {xxx[2]}   {xxx[3]}')
-                new_coor.append('{}{:>20}{:>13}{:>13}'.format(xxx[0], xxx[1], xxx[2], xxx[3]))
-                # print('{}{:>20}{:>13}{:>13}'.format(xxx[0], xxx[1], xxx[2], xxx[3]))
-                    
+                new_coor.append(
+                    "{}{:>20}{:>13}{:>13}".format(xxx[0], xxx[1], xxx[2], xxx[3])
+                )
+
         return new_coor
 
 
-
 parser = argparse.ArgumentParser()
-parser.add_argument('filename', nargs='+')
-parser.add_argument('-x', action='store_true')
+parser.add_argument("filename", nargs="+")
+parser.add_argument("-x", action="store_true")
 
 options = parser.parse_args()
 
@@ -98,7 +105,7 @@ if options.x:
 
         with open(os.path.join(fc, s), "w") as f:
             for line in x:
-                f.write(str(line)+"\n")
+                f.write(str(line) + "\n")
 else:
     try:
         fname = options.filename[0]

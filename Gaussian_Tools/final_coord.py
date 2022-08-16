@@ -55,7 +55,7 @@ class Read:
             s = i.split()
 
             if s[1] in uklad.keys():
-                xxx = list(uklad[s[1]]) + s[3:]
+                xxx = [uklad[s[1]]] + s[3:]
 
                 # new_coor.append(f'{xxx[0]}      {xxx[1]}   {xxx[2]}   {xxx[3]}')
                 new_coor.append(
