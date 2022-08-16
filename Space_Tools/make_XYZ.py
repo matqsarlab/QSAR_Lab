@@ -60,9 +60,9 @@ if options.all:
                     )
 
             with open(os.path.join(dir, sub_dir1, sub_dir2, "atom_info"), "w") as f:
-                f.write(sub_dir1 + f"= 1 - {len(xyz_obj1)}\n")
+                f.write(sub_dir1 + f"=1-{len(xyz_obj1)}\n")
                 f.write(
-                    sub_dir2 + f"= {1+len(xyz_obj1)} - {len(xyz_obj1)+len(xyz_obj2)}\n"
+                    sub_dir2 + f"={1+len(xyz_obj1)}-{len(xyz_obj1)+len(xyz_obj2)}\n"
                 )
                 pass
 else:
