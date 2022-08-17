@@ -3,9 +3,18 @@ import argparse
 import os
 import re
 
-parser = argparse.ArgumentParser()
-parser.add_argument("-ob", nargs="+")  # old basis set
-parser.add_argument("-nb")  # new basis set
+parser = argparse.ArgumentParser(
+    description="""Change basis set in Gaussian *.com file. It can be use for one Gaussian file or many file by paths to *.com files.""",
+    epilog="""Example: --> ./change_basis_set.py -ob */*com -nb new_basis""",
+)
+parser.add_argument(
+    "-com",
+    nargs="+",
+    help="Gaussian input file with old basis set",
+)  # old basis set
+parser.add_argument(
+    "-nb", help="file with new basis sets (with or not pseudopotentials)"
+)  # new basis set
 
 options = parser.parse_args()
 
@@ -14,7 +23,7 @@ def ch_basis_set():
 
     answer = input("Change basis set? y/N: ")
 
-    list_dir = (i for i in options.ob if os.path.isfile(i))
+    list_dir = (i for i in options.com if os.path.isfile(i))
 
     for path in list_dir:
 

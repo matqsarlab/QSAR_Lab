@@ -3,9 +3,19 @@ import argparse
 import os
 import re
 
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(
+    description="""
+    Create input Gaussian file *.com from xyz files. Program need indormations about atoms (atom_info file <--> generated autmatically by use
+    make_XYZ.py script) and methods/basis set (dft_info <--> look at dft_info file example).
+    """,
+    epilog="""Example: --> ./make_gaussian_COM.py Dir/Dir_with_XYZ_files/* -lock""",
+)
 parser.add_argument("filename", nargs="+")
-parser.add_argument("-lock", action="store_true")
+parser.add_argument(
+    "-lock",
+    action="store_true",
+    help="""if active; its create Gaussian input file with blocked first structure.""",
+)
 
 options = parser.parse_args()
 

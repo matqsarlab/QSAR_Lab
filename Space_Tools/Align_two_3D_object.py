@@ -78,4 +78,4 @@ class AA_add_transpose(NM_translate):
         rot_matrix = -quaternion_rotation_matrix(q)
         u_rotated = rot_matrix @ u
         new_xyz_obj2 = (rot_matrix @ new_xyz_obj2.T).T
-        return new_xyz_obj2 + 1.5 * v - u_rotated
+        return new_xyz_obj2 + 1.5 * v - u_rotated * 1.5

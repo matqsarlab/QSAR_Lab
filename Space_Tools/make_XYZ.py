@@ -7,10 +7,31 @@ import numpy as np
 from QSAR_Lab.Space_Tools.Align_two_3D_object import (AA_add_transpose,
                                                       NM_translate)
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--f1", nargs="+")
-parser.add_argument("--f2", nargs="+")
-parser.add_argument("-all", action="store_true")
+parser = argparse.ArgumentParser(
+    description="""
+    Create XYZ files build from 2 structures (s1, s2). Automatically rotate and translate objects to each other (rotation matrix from 
+    quaternions). Program can be use with flag -all then you direct list with structures 1 (s1) and list with structures 2 (s2) - automatically 
+    create main directories -> sub_directories (by structures 1) -> sub_sub_directories (by structures 2).
+    """,
+    epilog="""Example: --> ./make_XYZ.py -s1 dir1/*.xyz -s2 dir2/*.xyz -all,  
+    --> ./make_XYZ.py -s1 s1.xyz -s2 s2.xyz""",
+)
+parser.add_argument(
+    "-s1",
+    nargs="+",
+    help="structures 1 - can be either only one specific structures or path to structures",
+)
+parser.add_argument(
+    "-s2",
+    nargs="+",
+    help="structures 2 - can be either only one specific structures or path to structures",
+)
+parser.add_argument(
+    "-all",
+    action="store_true",
+    help="""if active; its work on lists of structures and automatically create directories with sub_directories if not; 
+    its based on one structers 1 and one structures 2 then printing""",
+)
 
 options = parser.parse_args()
 
@@ -26,8 +47,8 @@ if options.all:
     if not os.path.isdir(dir):
         os.mkdir(dir)
 
-    for i in options.f1:
-        for j in options.f2:
+    for i in options.s1:
+        for j in options.s2:
             obj1 = NM_translate(i)
             xyz_obj1 = obj1.translate_center_to_zero
 
@@ -67,8 +88,8 @@ if options.all:
                 pass
 else:
     try:
-        fname1 = options.f1[0]
-        fname2 = options.f2[0]
+        fname1 = options.s1[0]
+        fname2 = options.s2[0]
     except:
         print("Can't find an argument (Gaussian log file).")
     else:
