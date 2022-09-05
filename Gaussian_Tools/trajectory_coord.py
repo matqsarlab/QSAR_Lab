@@ -79,11 +79,11 @@ class Read:
 
 parser = argparse.ArgumentParser()
 parser.add_argument("filename", nargs="+")
-parser.add_argument("-x", action="store_true")
+parser.add_argument("-all", action="store_true")
 
 options = parser.parse_args()
 
-if options.x:
+if options.all:
 
     fc = "Final_Trajectories"
 
@@ -92,7 +92,7 @@ if options.x:
 
     for i in options.filename:
         ins = Read(i)
-        ins.standard_orientation
+        # ins.standard_orientation
 
         x = ins.make_xyz
 
@@ -114,7 +114,7 @@ else:
         print("Can't find an argument (Gaussian log file).")
     else:
         ins = Read(fname)
-        ins.standard_orientation
+        # ins.standard_orientation
         x = ins.make_xyz
 
         for i in x:

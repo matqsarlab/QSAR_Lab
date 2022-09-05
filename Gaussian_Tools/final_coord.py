@@ -81,7 +81,7 @@ if options.all:
 
     for i in options.filename:
         ins = Read(i)
-        ins.standard_orientation
+        # ins.standard_orientation
 
         x = ins.make_xyz
 
@@ -104,7 +104,7 @@ else:
         print("Can't find an argument (Gaussian log file).")
     else:
         ins = Read(fname)
-        ins.standard_orientation
+        # ins.standard_orientation
         x = ins.make_xyz
 
         for i in x:
