@@ -2,6 +2,7 @@
 
 import argparse
 import os
+import time
 
 import numpy as np
 
@@ -13,6 +14,7 @@ class Charge:
         self.filename = filename
         self.mulliken_atoms = []
         self.esp_atoms = []
+        self.nbo_atoms = []
         self.path_to_atom_info = path_to_atom_info
 
     @property
@@ -32,7 +34,7 @@ class Charge:
             charges_list = []
             for j in x:
 
-                if "Sum of" in j:
+                if "Sum of" in j or "====" in j:
                     break
 
                 charges_list.append(j)
@@ -40,6 +42,7 @@ class Charge:
 
         mulliken_ = []
         esp_ = []
+        nbo_ = []
 
         for i in x:
 
@@ -47,8 +50,10 @@ class Charge:
                 mulliken_ = selector()
             if "ESP charges:" in i:
                 esp_ = selector()
+            if "Charge         Core      Valence    Rydberg      Total" in i:
+                nbo_ = selector()
 
-        return mulliken_, esp_
+        return mulliken_, esp_, nbo_
 
     @property
     def charges_table(self):
@@ -61,17 +66,15 @@ class Charge:
 
         mulliken_ = create_table(self.find_line[0])
         esp_ = create_table(self.find_line[1])
+        nbo_ = create_table(self.find_line[2])
 
-        return mulliken_, esp_
+        return mulliken_, esp_, nbo_
 
-    @property
-    def specific_atoms_charge(self):
-
-        self.mulliken_atoms = []
-        self.esp_atoms = []
+    def specific_atoms_charge(self, switcher1=False, switcher2=False, switcher3=False):
 
         mulliken_specific_atoms = []
         esp_specific_atoms = []
+        nbo_specific_atoms = []
 
         def arthmetic(name, list_with_atoms):
             mull_values = list(map(lambda x: float(x.split()[-1]), list_with_atoms))
@@ -94,11 +97,14 @@ class Charge:
 
             for line in atom_spec:
 
-                if "mulliken" in line.lower():
+                if "mulliken" in line.lower() and switcher1 == True:
                     mulliken_specific_atoms = spec_number(mulliken_specific_atoms)
 
-                if "esp" in line.lower():
+                if "esp" in line.lower() and switcher2 == True:
                     esp_specific_atoms = spec_number(esp_specific_atoms)
+
+                if "nbo" in line.lower() and switcher3 == True:
+                    nbo_specific_atoms = spec_number(nbo_specific_atoms)
 
         # tworzenie listy z ladunkami mullikena dla wybranych atomow
         if mulliken_specific_atoms and mulliken_specific_atoms[0].lower() != "all":
@@ -110,7 +116,7 @@ class Charge:
 
             arthmetic("Mulliken charges", self.mulliken_atoms)
 
-        elif mulliken_specific_atoms[0].lower() == "all":
+        elif mulliken_specific_atoms and mulliken_specific_atoms[0].lower() == "all":
 
             for i in self.charges_table[0]:
                 self.mulliken_atoms.append(i)
@@ -127,14 +133,31 @@ class Charge:
 
             arthmetic("ESP charges", self.esp_atoms)
 
-        elif esp_specific_atoms[0].lower() == "all":
+        elif esp_specific_atoms and esp_specific_atoms[0].lower() == "all":
 
             for i in self.charges_table[1]:
                 self.esp_atoms.append(i)
 
             arthmetic("ESP charges", self.esp_atoms)
 
-        return self.mulliken_atoms, self.esp_atoms
+        # tworzenie listy z ladunkami NBO dla wybranych atomow
+        if nbo_specific_atoms and nbo_specific_atoms[0].lower() != "all":
+
+            for i in nbo_specific_atoms:
+                for j in self.charges_table[2]:
+                    if i == j.split()[1]:
+                        self.nbo_atoms.append(j)
+
+            arthmetic("NBO charges", self.nbo_atoms)
+
+        elif nbo_specific_atoms and nbo_specific_atoms[0].lower() == "all":
+
+            for i in self.charges_table[2]:
+                self.nbo_atoms.append(i)
+
+            arthmetic("NBO charges", self.nbo_atoms)
+
+        return self.mulliken_atoms, self.esp_atoms, self.nbo_atoms
 
     @property
     def standard_orientation(self):
@@ -156,19 +179,26 @@ class Charge:
                     xyz.append(j)
         return xyz
 
-    @property
-    def area(self):
+    def area(self, area1=False, area2=False, area3=False):
 
         sum_mulliken = 1
         sum_esp = 1
+        sum_nbo = 1
         if self.mulliken_atoms:
             sum_mulliken = float(self.mulliken_atoms[-2].split(":")[1])
+        elif area1 == True:
+            spec_atoms = self.specific_atoms_charge(switcher1=True)
+            sum_mulliken = float(spec_atoms[0][-2].split(":")[1])
         if self.esp_atoms:
             sum_esp = float(self.esp_atoms[-2].split(":")[1])
-        else:
-            spec_atoms = self.specific_atoms_charge
-            sum_mulliken = float(spec_atoms[0][-2].split(":")[1])
+        elif area2 == True:
+            spec_atoms = self.specific_atoms_charge(switcher2=True)
             sum_esp = float(spec_atoms[1][-2].split(":")[1])
+        if self.nbo_atoms:
+            sum_nbo = float(self.nbo_atoms[-2].split(":")[1])
+        elif area3 == True:
+            spec_atoms = self.specific_atoms_charge(switcher3=True)
+            sum_nbo = float(spec_atoms[2][-2].split(":")[1])
 
         xyz = self.standard_orientation
         a1 = None
@@ -202,7 +232,7 @@ class Charge:
         b1 = np.array(b1).astype(float)
         b2 = np.array(b2).astype(float)
         area = np.linalg.norm(np.subtract(a1, a2)) * np.linalg.norm(np.subtract(b1, b2))
-        return area, sum_mulliken / area, sum_esp / area
+        return area, sum_mulliken / area, sum_esp / area, sum_nbo / area
 
 
 parser = argparse.ArgumentParser()
@@ -211,9 +241,11 @@ parser.add_argument("-all", action="store_true")
 parser.add_argument("-area", action="store_true")
 parser.add_argument("-esp", action="store_true")
 parser.add_argument("-mulliken", action="store_true")
+parser.add_argument("-nbo", action="store_true")
 
 options = parser.parse_args()
 
+start = time.time()
 if options.all:
 
     fc = "Charges_Results"
@@ -236,22 +268,73 @@ if options.all:
         print(f"{s} is processing...")
         with open(os.path.join(fc, s), "w") as f:
             try:
-                if options.esp or options.mulliken:
-                    x = ins.specific_atoms_charge
 
-                    if options.mulliken:
-                        for line in x[0]:
-                            f.write(str(line) + "\n")
-                    if options.esp:
-                        for line in x[1]:
-                            f.write(str(line) + "\n")
+                if options.mulliken:
+                    x = ins.specific_atoms_charge(switcher1=True)
+                    for line in x[0]:
+                        f.write(str(line) + "\n")
+                if options.esp:
+                    x = ins.specific_atoms_charge(switcher2=True)
+                    for line in x[1]:
+                        f.write(str(line) + "\n")
+                if options.nbo:
+                    x = ins.specific_atoms_charge(switcher3=True)
+                    for line in x[2]:
+                        f.write(str(line) + "\n")
+
                 if options.area:
-                    area = ins.area
+                    area = ins.area(area1=False, area2=False, area3=False)
+                    f.write("-" * 88)
+                    f.write("\n")
+                    f.write(f"Area = {area[0]}\n")
+                elif options.area and options.mulliken and options.esp and options.nbo:
+                    area = ins.area(area1=True, area2=True, area3=True)
                     f.write("-" * 88)
                     f.write("\n")
                     f.write(f"Area = {area[0]}\n")
                     f.write(f"Sum_Mulliken / A^2 = {area[1]}\n")
                     f.write(f"Sum_ESP / A^2 = {area[2]}\n")
+                    f.write(f"Sum_NBO / A^2 = {area[3]}\n")
+                elif options.area and options.mulliken:
+                    area = ins.area(area1=True)
+                    f.write("-" * 88)
+                    f.write("\n")
+                    f.write(f"Area = {area[0]}\n")
+                    f.write(f"Sum_Mulliken / A^2 = {area[1]}\n")
+                elif options.area and options.esp:
+                    area = ins.area(area2=True)
+                    f.write("-" * 88)
+                    f.write("\n")
+                    f.write(f"Area = {area[0]}\n")
+                    f.write(f"Sum_ESP / A^2 = {area[2]}\n")
+                elif options.area and options.nbo:
+                    area = ins.area(area3=True)
+                    f.write("-" * 88)
+                    f.write("\n")
+                    f.write(f"Area = {area[0]}\n")
+                    f.write(f"Sum_NBO / A^2 = {area[3]}\n")
+                elif options.area and options.mulliken and options.esp:
+                    area = ins.area(area1=True, area2=True)
+                    f.write("-" * 88)
+                    f.write("\n")
+                    f.write(f"Area = {area[0]}\n")
+                    f.write(f"Sum_Mulliken / A^2 = {area[1]}\n")
+                    f.write(f"Sum_ESP / A^2 = {area[2]}\n")
+                elif options.area and options.mulliken and options.nbo:
+                    area = ins.area(area1=True, area3=True)
+                    f.write("-" * 88)
+                    f.write("\n")
+                    f.write(f"Area = {area[0]}\n")
+                    f.write(f"Sum_Mulliken / A^2 = {area[1]}\n")
+                    f.write(f"Sum_NBO / A^2 = {area[3]}\n")
+                elif options.area and options.esp and options.nbo:
+                    area = ins.area(area2=True, area3=True)
+                    f.write("-" * 88)
+                    f.write("\n")
+                    f.write(f"Area = {area[0]}\n")
+                    f.write(f"Sum_ESP / A^2 = {area[2]}\n")
+                    f.write(f"Sum_NBO / A^2 = {area[3]}\n")
+
             except:
                 print(
                     "Error - atom_specification not exist or problem with Gaussian log file!!!"
@@ -268,26 +351,64 @@ else:
         dirname_ = os.path.dirname(fname)
         path_ = os.path.join(dirname_, "atom_specification")
         ins = Charge(fname, path_)
-        # x = ins.specific_atoms_charge()
-        if options.esp or options.mulliken:
-            x = ins.specific_atoms_charge
 
-            if options.mulliken:
-                for i in x[0]:
-                    print(i)
-            if options.esp:
-                for i in x[1]:
-                    print(i)
+        if options.mulliken:
+            x = ins.specific_atoms_charge(switcher1=True)
+            for i in x[0]:
+                print(i)
+        if options.esp:
+            x = ins.specific_atoms_charge(switcher2=True)
+            for i in x[1]:
+                print(i)
+        if options.nbo:
+            x = ins.specific_atoms_charge(switcher3=True)
+            for i in x[2]:
+                print(i)
 
         if options.area:
-            area = ins.area
+            area = ins.area(area1=False, area2=False, area3=False)
+            print("-" * 88)
+            print(f"Area = {area[0]}")
+        elif options.area and options.mulliken and options.esp and options.nbo:
+            area = ins.area(area1=True, area2=True, area3=True)
             print("-" * 88)
             print(f"Area = {area[0]}")
             print(f"Sum_Mulliken / A^2 = {area[1]}")
             print(f"Sum_ESP / A^2 = {area[2]}")
+            print(f"Sum_NBO / A^2 = {area[3]}")
+        elif options.area and options.mulliken:
+            area = ins.area(area1=True)
+            print("-" * 88)
+            print(f"Area = {area[0]}")
+            print(f"Sum_Mulliken / A^2 = {area[1]}")
+        elif options.area and options.esp:
+            area = ins.area(area2=True)
+            print("-" * 88)
+            print(f"Area = {area[0]}")
+            print(f"Sum_ESP / A^2 = {area[2]}")
+        elif options.area and options.nbo:
+            area = ins.area(area3=True)
+            print("-" * 88)
+            print(f"Area = {area[0]}")
+            print(f"Sum_NBO / A^2 = {area[3]}")
+        elif options.area and options.mulliken and options.esp:
+            area = ins.area(area1=True, area2=True)
+            print("-" * 88)
+            print(f"Area = {area[0]}")
+            print(f"Sum_Mulliken / A^2 = {area[1]}")
+            print(f"Sum_ESP / A^2 = {area[2]}")
+        elif options.area and options.mulliken and options.nbo:
+            area = ins.area(area1=True, area3=True)
+            print("-" * 88)
+            print(f"Area = {area[0]}")
+            print(f"Sum_Mulliken / A^2 = {area[1]}")
+            print(f"Sum_NBO / A^2 = {area[3]}")
+        elif options.area and options.esp and options.nbo:
+            area = ins.area(area2=True, area3=True)
+            print("-" * 88)
+            print(f"Area = {area[0]}")
+            print(f"Sum_ESP / A^2 = {area[2]}")
+            print(f"Sum_NBO / A^2 = {area[3]}")
 
-        # for i in x:
-        #     print(i)
-
-        # for i in x:
-        #     print(i)
+stop = time.time()
+print(f"Process time = {stop - start}s")
