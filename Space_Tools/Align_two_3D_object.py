@@ -86,8 +86,6 @@ class AA_add_transpose(NM_translate):
         v = super().vec_direct
         super().__init__(self.object2)
         xyz_translated = super().translate_center_to_zero
-        # xyz_translated[0, :] = xyz_translated[0, :] - xyz_translated[1, :]
-        # xyz_translated[1, :] = xyz_translated[1, :] - xyz_translated[1, :]
         u = xyz_translated[1, :] - xyz_translated[0, :]
         angle = np.arccos((u @ v) / (np.linalg.norm(u) * np.linalg.norm(v)))
         axis = np.cross(u, v) / np.linalg.norm(np.cross(u, v))
@@ -107,11 +105,14 @@ class AA_add_transpose(NM_translate):
         axis = np.array([0, 0, 1])
         q = np.append(np.cos(np.pi / 4), np.sin(np.pi / 4) * axis)
         rot_matrix = -quaternion_rotation_matrix(q)
+
         xyz_horizontal = (rot_matrix @ xyz_rotated.T).T
+        xyz_horizontal_2 = np.flip(xyz_horizontal, 0)
 
         xyz_vertical = np.flip(xyz_rotated, 0)
         return (
             xyz_rotated + v + [0, -6.5, 0],
             xyz_horizontal + v - [0, 5, 0],
             xyz_vertical + v + [0, -6.5, 0],
+            xyz_horizontal_2 + v - [0, 5, 0],
         )

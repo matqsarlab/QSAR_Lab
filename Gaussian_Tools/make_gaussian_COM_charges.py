@@ -36,33 +36,31 @@ def block(xyz_coor, atom):
 def create_XYZ(lock=False):
     # only directories
     list_dir = (i for i in options.filename if not os.path.isfile(i))
-    a_info = None
+
+    def change_line(list, num, charge):
+        line = list[num].split()
+        line.insert(len(line), str(charge))
+        line.pop(0)
+        return "\t\t".join(line) + "\n"
 
     for path in list_dir:
-        n1 = path.split("/")[-1]
-        n2 = path.split("/")[-2]
         f_xyz_list = [f for f in os.listdir(path) if f.endswith("xyz")]
 
         for f_xyz in f_xyz_list:
-            if "rotated" in f_xyz:
-                a_info = "atom_info_rotated"
-            elif "horizontal" in f_xyz:
-                a_info = "atom_info_horizontal"
-            elif "vertical" in f_xyz:
-                a_info = "atom_info_vertical"
 
-            with open(path + "/dft_info") as dft, open(path + a_info) as atom, open(
-                os.path.join(path, f_xyz)
-            ) as xyz:
+            with open(path + "/dft_info") as dft, open(
+                path + "/atom_info"
+            ) as atom, open(os.path.join(path, f_xyz)) as xyz:
                 dft_info = dft.readlines()
                 atom_info = atom.readlines()
                 atom_1 = atom_info[0][1 + atom_info[0].index("=") :].replace("\n", "")
-                atom_2 = atom_info[1][1 + atom_info[1].index("=") :].replace("\n", "")
                 xyz_coor = xyz.readlines()[2:]
                 atoms = xyz_coor[:-2]
                 charges = xyz_coor[-2:]
-                charges[0] = charges[0].replace("charge", "1.0")
-                charges[1] = charges[1].replace("charge", "-1.0")
+
+                plus = change_line(charges, 0, 1.0)
+                minus = change_line(charges, 1, -1.0)
+                charges = [plus, minus]
 
                 if lock:
                     xyz_coor = block(xyz_coor, atom_1)
@@ -72,24 +70,18 @@ def create_XYZ(lock=False):
                 down = dft_info[1 + idx :]
 
                 idx_chk = [i for i, item in enumerate(up) if "%chk" in item][0]
-                up[idx_chk] = up[idx_chk].replace("\n", f"{n1}_{n2}\n")
+                up[idx_chk] = up[idx_chk].replace("\n", f"{f_xyz.split('.')[0]}\n")
                 charge = up[-1][0]
-
-                idx_dft = [
-                    i for i, item in enumerate(down) if re.search("^[***]", item)
-                ]
 
             with open(os.path.join(path, f_xyz.replace("xyz", "com")), "w") as com:
                 com.write("".join(up))
                 com.write("".join(atoms))
                 com.write("\n")
+                com.write("".join(charges))
+                com.write("\n")
                 com.write(atom_1 + " " + charge + "\n")
                 com.write("".join(down))
                 com.write("\n")
-                com.write("".join(charges))
-                com.write("\n")
-                # com.write("".join(down[idx_dft[1] - 1 :]))
-                # com.write("\n")
 
 
 if options.lock:

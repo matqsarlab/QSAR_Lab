@@ -52,8 +52,8 @@ if options.all:
                 f.write("{}{:>20}{:>13}{:>13}\n".format(n, coor[0], coor[1], coor[2]))
         return 1
 
-    def atom_info(xyz1, xyz2, kind):
-        with open(os.path.join(dir, sub_dir1, f"atom_info_{kind}"), "w") as f:
+    def atom_info(xyz1, xyz2):
+        with open(os.path.join(dir, sub_dir1, f"atom_info"), "w") as f:
             f.write(sub_dir1 + f"=1-{len(xyz1)}\n")
             f.write(sub_dir2 + f"={1+len(xyz1)}-{len(xyz2)}\n")
         return 1
@@ -80,10 +80,12 @@ if options.all:
             xyz_rotated = np.append(xyz_obj1, xyz_obj2[0], axis=0).round(decimals=4)
             xyz_horizontal = np.append(xyz_obj1, xyz_obj2[1], axis=0).round(decimals=4)
             xyz_vertical = np.append(xyz_obj1, xyz_obj2[2], axis=0).round(decimals=4)
+            xyz_horizontal2 = np.append(xyz_obj1, xyz_obj2[3], axis=0).round(decimals=4)
 
             xyz_rotated = to_xyz(xyz_rotated)
             xyz_horizontal = to_xyz(xyz_horizontal)
             xyz_vertical = to_xyz(xyz_vertical)
+            xyz_horizontal2 = to_xyz(xyz_horizontal2)
 
             sub_dir1 = i.split("/")[-1].replace(".xyz", "")
             if not os.path.isdir(os.path.join(dir, sub_dir1)):
@@ -96,14 +98,14 @@ if options.all:
             path_rotated = path.replace(".xyz", "_rotated.xyz")
             path_horizontal = path.replace(".xyz", "_horizontal.xyz")
             path_vertcial = path.replace(".xyz", "_vertcial.xyz")
+            path_horizontal2 = path.replace(".xyz", "_horizontal2.xyz")
 
             save(xyz_rotated, path_rotated)
             save(xyz_horizontal, path_horizontal)
             save(xyz_vertical, path_vertcial)
+            save(xyz_horizontal2, path_horizontal2)
 
-            atom_info(xyz_obj1, xyz_rotated, "rotated")
-            atom_info(xyz_obj1, xyz_horizontal, "horizontal")
-            atom_info(xyz_obj1, xyz_vertical, "vertical")
+            atom_info(xyz_obj1, xyz_rotated)
 else:
     try:
         fname1 = options.s1[0]
