@@ -4,17 +4,19 @@ import itertools
 import numpy as np
 import pandas as pd
 import plotly.figure_factory as ff
+from sklearn.base import clone
 from sklearn.metrics import (accuracy_score, classification_report,
-                             confusion_matrix, precision_score, recall_score)
-from sklearn.naive_bayes import GaussianNB
+                             confusion_matrix, matthews_corrcoef,
+                             precision_score, recall_score)
 
 
 class Make_models:
-    def __init__(self, train, test, toxic, perm_num) -> None:
+    def __init__(self, model, train, test, toxic, perm_num) -> None:
         self.train = train
         self.test = test
         self.toxic = toxic
         self.perm_num = perm_num
+        self.clasificator_model = model
         self.__show = False
         self.__model = []
 
@@ -82,7 +84,7 @@ class Make_models:
             X_test = test.drop("y", axis=1)
             y_test = test["y"]
 
-            model = GaussianNB()
+            model = clone(self.clasificator_model)
             model.fit(X_train, y_train)
             self.__model.append(model)
 
@@ -149,7 +151,7 @@ class Make_models:
                 nms[nm].append(pred)
 
         for nm in nms:
-            mean[nm] = str(np.where(np.mean(nms[nm]) <= 0.5, "Non-Toxic", "Toxic"))
+            mean[nm] = str(np.where(np.mean(nms[nm]) < 0.5, "Non-Toxic", "Toxic"))
 
         return pd.DataFrame(
             data=mean.values(), index=mean.keys(), columns=["Predicted Toxicity"]
@@ -185,7 +187,7 @@ class Make_models:
             X_test = test.drop("y", axis=1)
             y_test = test["y"]
 
-            model = GaussianNB()
+            model = clone(self.clasificator_model)
             model.fit(X_train, y_train)
 
             model.predict(X_test)
