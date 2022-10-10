@@ -25,7 +25,7 @@ class Make_models:
         tox_list = self.toxic.index.tolist()
         data_sets = {}
 
-        x = itertools.permutations(tox_list, self.perm_num)
+        x = itertools.combinations(tox_list, self.perm_num)
         c = 0
 
         for i in x:
