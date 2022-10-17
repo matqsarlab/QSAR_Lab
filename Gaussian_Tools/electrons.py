@@ -4,7 +4,18 @@ import sys
 
 filelist = sys.argv[1:]
 
-atomic_num = {"C": 6, "O": 8, "H": 1, "N": 7, "S": 16, "Ti": 22, "Cd": 48, "Se": 34}
+atomic_num = {
+    "C": 6,
+    "Si": 14,
+    "O": 8,
+    "H": 1,
+    "N": 7,
+    "S": 16,
+    "Ti": 22,
+    "Cd": 48,
+    "Se": 34,
+    "Fe": 26,
+}
 
 
 class Electrons:
