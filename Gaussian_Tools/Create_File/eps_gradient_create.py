@@ -14,16 +14,16 @@ def reader(xyz, *args, **kwargs):
     return xyz
 
 
-def saver(template: str, number: int, name: str) -> None:
-    for i in range(number):
+def saver(template: str, start: int, stop: int, step: int, name: str) -> None:
+    for i in range(start, stop, step):
         x = reader(
             template,
-            f"EPS={(i+1)*5}\n\n",
-            checkpoint=f"%chk=CNT_COO-_high_dipole{(i+1)*5}\n",
+            f"EPS={i}\n\n",
+            checkpoint=f"%chk=CNT_COO-_high_dipole{(i)}\n",
         )
 
-        with open(f"{name}_{(i+1)*5}.com", "w") as f:
+        with open(f"{name}_{(i)}.com", "w") as f:
             f.writelines(x)
 
 
-saver("./template", 15, "CNT_COO-_high_dipole")
+saver("./template", 50, 190, 10, "CNT_COO-_high_dipole")
