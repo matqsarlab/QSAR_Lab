@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.10
+#!/usr/bin/env python3.11
 import itertools
 
 import numpy as np
@@ -10,7 +10,7 @@ from sklearn.metrics import (accuracy_score, classification_report,
 
 
 class CoreModel:
-    def __init__(self, model, train, test, toxic, perm_num) -> None:
+    def __init__(self, model, train, test, toxic, perm_num=2) -> None:
         self.train = train
         self.test = test
         self.toxic = toxic
@@ -19,6 +19,13 @@ class CoreModel:
         self.__show = False
         self.__numberOfPlots = 5
         self.__show_raport = False
+        self.__namesNMs = (
+            train.index.tolist() + test.index.tolist() + toxic.index.tolist()
+        )
+        self.__predOnTest = False
+        self.__percent = False
+        self.__nmsTestDict = {k: [] for k in self.__namesNMs}
+        self.__nmsTestDict_proba = self.__nmsTestDict.copy()
         CoreModel.modelKlas = []
         CoreModel.dataSets = {}
 
@@ -93,6 +100,8 @@ class CoreModel:
     def create_models(self):
         CoreModel.modelKlas.clear()
         data_sets = self.create_data_set
+        print("__predOnTest GLOBAL: ", self.__predOnTest)
+
         for e, name in enumerate(data_sets):
             train = data_sets[name][0]
             test = data_sets[name][1]
@@ -107,7 +116,19 @@ class CoreModel:
             model.fit(X_train, y_train)
             CoreModel.modelKlas.append(model)
 
-            if self.__show == True:
+            if self.__predOnTest:
+                y_test_pred = model.predict(X_test)
+
+                for v, k in zip(y_test_pred, y_test.index):
+                    self.__nmsTestDict[k].append(v)
+
+            if self.__percent:
+                y_test_pred = model.predict_proba(X_test)
+
+                for v, k in zip(y_test_pred, y_test.index):
+                    self.__nmsTestDict_proba[k].append(v)
+
+            if self.__show:
                 if e >= self.__numberOfPlots - 1:
                     self.__show = False
 
@@ -120,14 +141,53 @@ class CoreModel:
                 cm_test = confusion_matrix(y_test, y_test_pred)
 
                 self.plot_confusion_matrix(cm_train, f"TRAIN {e+1}")
-                if self.show_raport == True:
+                if self.show_raport:
                     print(classification_report(y_train, y_train_pred))
 
                 self.plot_confusion_matrix(cm_test, f"TEST {e+1}")
-                if self.show_raport == True:
+                if self.show_raport:
                     print(classification_report(y_test, y_test_pred))
 
         return
+
+    @property
+    def predOnTest(self):
+        return self.__predOnTest
+
+    @predOnTest.setter
+    def predOnTest(self, value):
+        self.__predOnTest = value
+
+    @property
+    def predict_on_test(self):
+        self.__predOnTest = True
+
+        print("__predOnTest from func: ", self.__predOnTest)
+        exist = False
+        for k in self.__nmsTestDict:
+            if self.__nmsTestDict[k]:
+                exist = True
+                break
+        mean = {}
+
+        def calc_mean(obj, mean_dict):
+            mean_dict[nm] = str(np.where(np.mean(obj[nm]) < 0.5, "Non-Toxic", "Toxic"))
+            return mean_dict
+
+        if exist:
+            print("IF")
+            for nm in self.__nmsTestDict:
+                if self.__nmsTestDict[nm]:
+                    calc_mean(self.__nmsTestDict, mean)
+        else:
+            _ = self.create_models
+            print("ELSE")
+            for nm in self.__nmsTestDict:
+                if self.__nmsTestDict[nm]:
+                    calc_mean(self.__nmsTestDict, mean)
+        return pd.DataFrame(
+            data=mean.values(), index=mean.keys(), columns=["Predicted Toxicity"]
+        )
 
     def predict(self, X):
         nms = {nm: [] for nm in X.index}
@@ -167,7 +227,7 @@ class CoreModel:
         mean_fn_test = []
         mean_tp_test = []
 
-        for name in data_sets:
+        for name, model in zip(data_sets, CoreModel.modelKlas):
             train = data_sets[name][0]
             test = data_sets[name][1]
 
@@ -176,11 +236,6 @@ class CoreModel:
 
             X_test = test.drop("y", axis=1)
             y_test = test["y"]
-
-            model = clone(self.clasificator_model)
-            model.fit(X_train, y_train)
-
-            model.predict(X_test)
 
             y_train_pred = model.predict(X_train)
             y_test_pred = model.predict(X_test)
@@ -230,6 +285,43 @@ class CoreModel:
         print(f"fn = {np.mean(mean_fn_test)}")
         print(f"tp = {np.mean(mean_tp_test)}")
         return 0
+
+    @property
+    def predOnTest_percent(self):
+        return self.__percent
+
+    @predOnTest_percent.setter
+    def predOnTest_percent(self, value):
+        self.__percent = value
+
+    @property
+    def predict_on_test_proba(self):
+        self.__percent = True
+
+        exist = False
+        for k in self.__nmsTestDict_proba:
+            if self.__nmsTestDict_proba[k]:
+                exist = True
+                break
+        mean = {}
+
+        def calc_mean(obj, mean_dict, nm):
+            prob_toxic = [i[1] for i in obj[nm]]
+            mean_dict[nm] = np.mean(prob_toxic)
+            return mean_dict
+
+        if exist:
+            for nm in self.__nmsTestDict_proba:
+                if self.__nmsTestDict_proba[nm]:
+                    calc_mean(self.__nmsTestDict_proba, mean, nm)
+        else:
+            _ = self.create_models
+            for nm in self.__nmsTestDict_proba:
+                if self.__nmsTestDict_proba[nm]:
+                    calc_mean(self.__nmsTestDict_proba, mean, nm)
+        return pd.DataFrame(
+            data=mean.values(), index=mean.keys(), columns=["Predicted Toxicity [%]"]
+        )
 
 
 class CombinationModel(CoreModel):
@@ -300,10 +392,6 @@ class CombinationModel(CoreModel):
 
     def plot_confusion_matrix(self, cm, title):
         return super().plot_confusion_matrix(cm, title)
-
-    @CoreModel.show_models.setter
-    def show_models(self, value):
-        return CoreModel.show_models.fset(self, value)
 
     @property
     def create_models(self):
