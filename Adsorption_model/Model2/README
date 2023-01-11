@@ -1,0 +1,123 @@
+Procedura znalezienia odpowiedniego modelu. 
+Zawiera ostateczne wersje skryptow i danych.
+
+------------------------------------------------------------
+                Scripts & Directories
+
+1. Data
+   a. Data.xlsx            -  orginalne dane,
+   b. My_Data.xlsx         -  przygotowane dane pod uzycie skryptu,
+   c. My_Selected_X.xlsx   -  dane, ktore zawieraja tylko istotne deskryptory wybrane
+                              na podstawie wstepnej analizy.
+   d. data_dummies.xlsx    -  Zawiera nadmiarowe deskryptory dla AAs (Alvadesk), NMs (Gaussian), 
+                              wartosci energii adsorpcji dla wszystkich ukladow NM-AA.
+
+2. choose_descriptors.py   -  Testy statystyczne, ktore wybieraja zestaw najbardziej znaczacych deskryptorow.
+3. FiltredModels           -  Katalog, w ktorym zawarte sa wszystkie modele spelniajace kryteria 
+                              istotnosci (test R^2, Rcv^2). Tego katalogu (zapis) uzywa skrypt
+                              find_models.py
+   a. filtred.txt          -  Plik zawierajacy wartosci odpowiednich hiperparametrow dla modelu AdaBoost.
+
+4. find_models.py          -  Metoda, ktora pozwala na znalezienie interesujacych modeli z odpowiednimi
+                              wartosciami wielkosci statystycznych. Pozwala na ustalenie odpowiednich wartosci
+                              hiperparametrow dla algorytm AdaBoost.
+6. load_data.py            -  Wczytuje dane. Wykorzystywane przez `adsorption_model.ipynb`
+7. adsorption_model.ipynb  -  Ostateczny model, ktory wykorzystuje znalezione hiperparametry do zbudowania
+                              modelu.
+------------------------------------------------------------
+
+Opis:
+`````````````````````````````````````````````````````````````
+
+1.  Wytypowanie najbardziej znaczacych deskryptorow przy pomocy skryptu
+    `choose_descriptors.py`. Skrypt zawiera cztery testy (varianceSelect, 
+    f_regression, r_regression, mutual_info_regression) za pomoca ktorych 
+    nastepuje pierwotna selekcja (wybor) deskryptorow dla NMs i AA. 
+
+    Przepuszczenie skryptu na wszystkich deskryptorach NMs ostateczie
+    typuje 8 deskryptorow - te deskryptory sa wziete do dalszej analizy.
+    Wstepnie sprawdzane sa deskryptory NMs i AAs pod wzgledem wariancji -
+    pozostaja te, ktorych wariancja jest wieksza niz 16% (sklearn 1.13. Feature selection).
+    Kazdy z testow typuje kilka deskryptorow - niektore z nich sie powta-
+    rzaja, co w ostatecznosci prowadzi do uzyskania 8 deskryptorow. 
+    Otrzymane deskryptory to: 'Dipole moment (Debye)', 'FDH_horiz_mean',
+    'FDV (+. -) (finite dipole vertical) (kcal/mol) ', 'FDV (-. +) 
+    (finite dipole vertical) (kcal/ mol) ', 'HOMO eigenvalue (eV)', 
+    'LUMO eigenvalue (eV)', 'Quadrupole moment (1/3 of trace of 
+    diagonalized matrix Q) (Debye×Å)', 'Σ Pauling electronegativity / Å^2'. 
+
+    W przypadku seleckji deskryptorow dla AAs wytypowane sa 104 deskrytpo-
+    ry (sposrod 114 dostepnych). Dla dwoch pierwszych testow (f_regression,
+    r_regression) algorytm 6 znaczacych deskryptorow (po trzy na kazdy test).
+    W celu zawezenia liczby deskryptorow z testu mutual_info_regression wybrane
+    zostaly 3 najbardziej znaczace. Otrzymano 9 nastepujacych deskryptorow:
+    'BLTD48', 'ECC', 'ESOL', 'MW', 'O%', 'UNIP'. Z racji, ze `BLTD48` nie ma
+    racjonalnej interpretacji w kontekscie adsorpcji, zostal on odrzucony ze 
+    zbioru. Dodatkowo zostala podjeta decyzja o usrednieniu dwoch deksyrptorow
+    opisujacych oddzialywanie NM z wertykalnie ustawionym dipolem elektrycznym
+    w dwoch roznych orientacjach. Tym samym z dwoch deksryptorow (FDV) powstal
+    jeden usredniony deskryptor FDV_mean, co jednoczesnie zredukowalo liczebnosc
+    deskryptorow.
+
+2.  Drugi etap modelowanie dotyczyl opracowanie modelu sensu stricte. W tym 
+    kroku zostala wybrana metoda AdaBoost, ktora w istocie oparta jest na wy-
+    korzystaniu wielu drzew decyzyjnych i wzmacnianiu tych cech, ktore w zna-
+    cznym stopniu koreluja ze zmienna zalezna y. Z racji, ze metoda AdaBoost
+    jest istotnie zalezna od poczatkowego doboru deskryptorow przy implementacji
+    (jest to czynnik stochastyczny) waznym jest, by wybrac taka pare deskrypto-
+    row, ktora prowadzi do otrzymania najlepszego modelu - w tym celu nalezy
+    znalezc odpowiednia wartosc hiperparametru, kontrolujacego wybor pierwszych
+    deskryptorow (domyslnie wartosc losowa). 
+
+3.  Po otrzymaniu modelu bada sie jego predykcyjnosc oraz ocenia jego elastycznosc,
+    co w tym przypadky oznacza przeprowadzenie procedury wallidacji krzyzowej.
+    Metoda walidacji krzyzowej wymaga sprecyzowania liczby krokow walidacji
+    (ilosc tak zwanych foldow), zbioru treningowego i testowego (zarowno licze-
+    bnosci, jak i wybor obiektow). Sa to zatem kolejne stopnie swobody, ktore utru-
+    dniaja wytypowanie i opracowanie odpowiedniego modelu. Wielkosc zbioru treningowe
+    oraz testowego wynosza odpowiednio 75% (150 obiektow) i 25% (50 obiektow)
+    a liczba foldow zostala ustawiona na 5. Obiekty obydwu zbiorow sa wybierane 
+    w sposob losowy dla kazdego z "foldow" - kazdy fold ma unikatowy zbior treningo-
+    wy i testowy. Zeby uzyskac powtarzalnosc modelu nalezalo zatem ustalic odpo-
+    wiedni hiperparametr odpowiadajacy za podzial na zbior treningowy i testowy
+    z kazdym z foldow, tak by za kazdym razem (przy kazdym uruchomieniu modelu
+    od poczatku) podzial byl taki sam (zapewnienie powtarzalnosci).
+
+Procedura (algorytm):
+`````````````````````````````````````````````````````````````
+1.  choose_descriptors.py:
+
+    a. Usuwanie deskryptorow o niskiej wariancji - odrzucenie tych, ktorych wariancja jest nizsza
+    niz 16% (1.13. Feature selection - rozklad Bernoulliego dla zmiennych losowych dla p=80%).
+
+    b. Jednowymiarowy wybor deskryptorow (SelectKBest) - zastosowanie trzech testow (f_regression,
+    r_regression, mutual_info_regression) do selekcji deskryptorow dla NMs i AAs.
+
+2.  find_models.py:
+
+    a. Sortowanie wszystkich danych wzgledem wzrastajacej energii adsorpcji
+    b. Podzial na zbior treningowy i testowy metoda 1:3
+    c. Eksploracja w poszukiwaniu odpowiedniej wartosci hiperparametru random_state
+       w metodzie AdaBoost tak by uzyskac zadowalajaca wartosc Rtrain^2. Funkcja celu
+       jest maksymalny blad liczony jako wartosc bezwgledna roznicy y_pred i y_obs.
+       Jesli CHOCIAZ JEDEN z obiektow ma odchylenie wieksze niz wartosc progowa (6.5)
+       to rozpatrywana jest nastepna (losowa) wartosc random_state. Zapewnienie takiego
+       warunku gwarantuje wysoka wartosc R^2.
+    d. Przeprowadzenie Cross-Walidacji wykorzystujac model z punktu (c). W tym kroku
+       rowniez poszukiwana jest wartosc hiperparametru random_state, ktora zapewni
+       zadowalajaca wartosc statystyki Rcv^2 (srednia po 5 foldach), ktorego wartosc
+       graniczna ustawiona jest na Rcv^2 > 0.6. Dodatkowo musi zostac spelniony warunek,
+       ze maksymalny blad predykcji dla pojedynczego liczony jako wartosc bezwgledna
+       z roznicy y_pred i y_obs nie moze byc wiekszy niz 8. W sytuacji, gdy wartosc Rcv^2
+       jest mniejsza niz wartosc oczekiwana, nastepuje wylosowanie innej wartosci random_state.
+       Analogicznie w sytuacji, w ktorej okaze sie, ze blad predykcji dla ktoregos z obiektow
+       jest wiekszy niz wartosc graniczna 8.
+
+       !!! Jesli po wielu probach nie znajdzie sie random_state zapewniajacy obydwa warunki
+           to powtarzany jest krok (c). W przypadku, gdy obydwa testy walidacyjne sa pozytywnie
+           spelnione program przechodzi do punktu (e).
+
+    e. Zapisanie zestawu hiperparametrow do pliku tekstowego filtred.txt
+    e. W ostatnim etapie sprawdzane sa zdolnosci predykcyjne modelu na zewnetrznym zbiorze testowym
+       (50 obiektow). Sposrod wielu modeli wybrany zostaje ten, ktorego wartosc Rtest^2 jest 
+       wystarczajaco wysoka i zadowalajaca.
