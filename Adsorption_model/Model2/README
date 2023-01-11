@@ -121,3 +121,28 @@ Procedura (algorytm):
     e. W ostatnim etapie sprawdzane sa zdolnosci predykcyjne modelu na zewnetrznym zbiorze testowym
        (50 obiektow). Sposrod wielu modeli wybrany zostaje ten, ktorego wartosc Rtest^2 jest 
        wystarczajaco wysoka i zadowalajaca.
+
+
+Opis modelu:
+`````````````````````````````````````````````````````````````
+
+                      Statystyki
+ _______________________Modelu_________________________ 
+
+  Rtrain^2 = 0.84
+  Rtest^2  = 0.72
+  Rcv^2    = 0.71
+ ______________________________________________________ 
+
+  Model oparty o algorytm AdaBoost. Pojedynczym estymatorem jest
+  proste drzewo decyzyjne, ktorego maksymalna glebokosc wynosi 3.
+  Model sklada sie z 27 prostych drzew. 
+  Funcja straty, ktora sluzy do aktualizacji wag w kazdej iteracji
+  wzmocnienia uczenia, jest prosta funkcja liniowa.
+
+  Prawie wszystkie obiekty ze zbioru treningowego i testowego leza w dzie-
+  dzinie modelu. 3 obiekty ze zbioru testowego znajduja sie poza dziedzina
+  (poza 3 wartosciami sigma), ale nie przekraczaja wartosci h_k. Oznacza to,
+  ze mimo podobienstwa strukturalnego danych (nie przekroczona wartosc h_k)
+  model blednie dokonuje predykcji (blad wiekszy niz 3sigma). Sa to:
+  Au: (ASN, PHE).
