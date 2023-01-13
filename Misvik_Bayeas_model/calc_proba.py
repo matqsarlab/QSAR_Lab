@@ -31,7 +31,7 @@ class Probability:
             return "Probability: '{}' = {}".format(", ".join(self.col_names), y / x)
 
         except ZeroDivisionError as err:
-            print("Handling run-time error:", err)
+            return print("Handling run-time error:", err)
 
 
 """

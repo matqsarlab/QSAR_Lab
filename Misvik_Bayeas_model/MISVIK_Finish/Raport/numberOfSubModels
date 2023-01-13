@@ -1,0 +1,152 @@
+# Raport zawierajacy opis 6 modeli MISVIK
+# ________________________________________________________________________________
+# Kazdy z modeli sklada sie z pewnej liczby pod modeli (submodel).
+# Submodel ma charakterystyczny zestaw testowy i treningowy. Model
+# koncowy jest srednia predykcji wszystkich submodeli. Kazdy submodel 
+# uczony jest na unikatowym zbiorze treningowym, a predykcje dokonywane
+# sa na unikatowym zbiorze testowym - przewidywania dla NMs ze zbioru
+# testowego sa zapisywane (informacja: toxic/non-toxic), by na koncu
+# stwierdzic jaka odpowiedz pojawiala sie czesciej. Jesli dla danej 
+# NM czesciej zdarzala sie predykcja `tox`, to taka NM zakfalifikowana
+# bedzie jako toksyczna.
+
+________MODELE_________
+
+OX  A549:        6970 submodeli
+    ____________________________
+    Train Stat:
+      Accuracy:            0.84     
+      Precison:            0.70     
+        Recall:            1.00
+            TN:             7.6
+            FP:             2.4
+            FN:             0.0
+            TP:             5.0
+    ----------------------------
+    Test  Stat:
+      Accuracy:            0.61     
+      Precison:            0.55     
+        Recall:            0.61
+            TN:             2.8
+            FP:             1.1
+            FN:             1.2             
+            TP:             0.8
+    ____________________________
+
+---------------------------------------------------------------------------------
+
+OX  BEAS:        5358 submodeli
+    ____________________________
+    Train Stat:
+      Accuracy:            0.93        
+      Precison:            0.72         
+        Recall:            1.00    
+            TN:            11.9 
+            FP:             1.1
+            FN:             0.0
+            TP:             0.9
+    ----------------------------
+    Test  Stat:
+      Accuracy:            0.82
+      Precison:            0.69
+        Recall:            0.82
+            TN:             4.0
+            FP:             0.0
+            FN:             1.1
+            TP:             0.9
+    ____________________________
+
+---------------------------------------------------------------------------------
+
+OX  Hep72g:     10465 submodeli
+    ____________________________
+    Train Stat:
+      Accuracy:           0.96          
+      Precison:           0.87          
+        Recall:           1.00     
+            TN:           11.5 
+            FP:            0.5 
+            FN:            0.0 
+            TP:            3.0 
+    ----------------------------
+    Test  Stat:
+      Accuracy:           0.84 
+      Precison:           0.80 
+        Recall:           0.84 
+            TN:            3.8 
+            FP:            0.2 
+            FN:            0.8 
+            TP:            1.2 
+    ____________________________
+
+---------------------------------------------------------------------------------
+
+DNA A549:       10914 submodeli
+    ____________________________
+    Train Stat:
+      Accuracy:            0.89     
+      Precison:            0.98     
+        Recall:            0.81
+            TN:             6.8
+            FP:             0.2
+            FN:             1.5             
+            TP:             6.5
+    ----------------------------
+    Test  Stat:
+      Accuracy:            0.60     
+      Precison:            0.54     
+        Recall:            0.60
+            TN:             2.8
+            FP:             1.2
+            FN:             1.2             
+            TP:             0.8
+    ____________________________
+
+---------------------------------------------------------------------------------
+
+DNA BEAS:        8997 submodeli
+    ____________________________
+    Train Stat:            
+      Accuracy:            0.84         
+      Precison:            0.83         
+        Recall:            0.82    
+            TN:             8.5
+            FP:             1.5
+            FN:             0.9
+            TP:             4.1
+    ----------------------------
+    Test  Stat:
+      Accuracy:            0.54
+      Precison:            0.50
+        Recall:            0.54
+            TN:             2.5
+            FP:             1.5
+            FN:             1.3
+            TP:             0.7
+    ____________________________
+
+---------------------------------------------------------------------------------
+
+DNA Hep72g:      8658 submodeli
+    ____________________________
+    Train Stat:
+      Accuracy:            0.91         
+      Precison:            0.72         
+        Recall:            1.00    
+            TN:            10.7
+            FP:             1.3 
+            FN:             0.0
+            TP:             3.0
+    ----------------------------
+    Test  Stat:
+      Accuracy:            0.80
+      Precison:            0.76
+        Recall:            0.80
+            TN:             3.8
+            FP:             0.2
+            FN:             1.0
+            TP:             1.0
+    ____________________________
+
+---------------------------------------------------------------------------------
+
