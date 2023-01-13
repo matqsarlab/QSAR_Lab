@@ -127,3 +127,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Untrack TODO
+./Misvik_Bayeas_model/MISVIK_Finish/Raport/TODO
