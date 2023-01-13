@@ -129,4 +129,4 @@ dmypy.json
 .pyre/
 
 # ignore TODO from MISVIK
-./Misvik_Bayeas_model/MISVIK_Finish/Raport/TODO.txt
+Misvik_Bayeas_model/MISVIK_Finish/Raport/TODO
