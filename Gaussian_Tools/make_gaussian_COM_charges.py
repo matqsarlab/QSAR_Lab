@@ -5,16 +5,18 @@ import re
 
 parser = argparse.ArgumentParser(
     description="""
-    Create input Gaussian file *.com from xyz files. Program need indormations about atoms (atom_info file <--> generated autmatically by use
-    make_XYZ.py script) and methods/basis set (dft_info <--> look at dft_info file example).
+    Creates Gaussian input file *.com from *.xyz files. Program need indormations about atoms (atom_info file <--> generated autmatically by use
+    make_XYZ.py script) and methods/basis set (dft_info <--> look at dft_info file example). If you want to freeze structure 1
+    add flag -lock.
     """,
-    epilog="""Example: --> ./make_gaussian_COM.py Dir/Dir_with_XYZ_files/* -lock""",
+    epilog="""Example: --> ./make_gaussian_COM_charges.py Dir/Dir_with_XYZ_files/* -lock
+    --> ./make_gaussian_COM_charges.py Dir/Dir_with_XYZ_files/*""",
 )
 parser.add_argument("filename", nargs="+")
 parser.add_argument(
     "-lock",
     action="store_true",
-    help="""if active; its create Gaussian input file with blocked first structure.""",
+    help="""if active; creates Gaussian input file with blocked first structure.""",
 )
 
 options = parser.parse_args()
@@ -53,7 +55,7 @@ def create_XYZ(lock=False):
             ) as atom, open(os.path.join(path, f_xyz)) as xyz:
                 dft_info = dft.readlines()
                 atom_info = atom.readlines()
-                atom_1 = atom_info[0][1 + atom_info[0].index("=") :].replace("\n", "")
+                atom_1 = atom_info[3][1 + atom_info[3].index("=") :].replace("\n", "")
                 xyz_coor = xyz.readlines()[2:]
                 atoms = xyz_coor[:-2]
                 charges = xyz_coor[-2:]
