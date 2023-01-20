@@ -5,7 +5,7 @@ import pandas as pd
 from QSAR_Lab.Space_Tools.rotation_matrix import quaternion_rotation_matrix
 
 
-class NM_translate:
+class Structure1_translate:
     def __init__(self, object: str) -> None:
         self.object = object
         pass
@@ -62,7 +62,7 @@ class NM_translate:
         return np.array([0, mmin[1], 0])
 
 
-class AA_add_transpose(NM_translate):
+class Structure2_add_rotate(Structure1_translate):
     def __init__(self, object: str, object2: str) -> None:
         self.object = object
         self.object2 = object2
