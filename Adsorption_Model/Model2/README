@@ -130,8 +130,29 @@ Opis modelu:
  _______________________Modelu_________________________ 
 
   Rtrain^2 = 0.84
+  RMSEtrain^2 = 1.51
   Rtest^2  = 0.72
-  Rcv^2    = 0.71
+  RMSEtest^2 = 1.85
+
+  Rcv^2 (train)    = 0.88
+  RMSE (train)     = 1.30
+  Rcv^2 (test)     = 0.73
+  RMSE (test)      = 1.86
+ ______________________________________________________ 
+
+                      Parametry
+ _______________________Modelu_________________________ 
+ n_estimators = 27
+ max_depth    = 3 
+ estimator    = DecisionTreeRegressor
+ loss func.   = linear 
+ random_state = 420
+
+### Cross-Validation ###
+ShuffleSplit
+n_splits      = 5
+test_size     = 0.25
+random_state  = 3956
  ______________________________________________________ 
 
   Model oparty o algorytm AdaBoost. Pojedynczym estymatorem jest
