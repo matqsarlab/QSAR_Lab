@@ -1,12 +1,11 @@
 #!/usr/bin/env python3.10
 import numpy as np
 import pandas as pd
+from load_data import loadData
 from sklearn.feature_selection import (SelectKBest, VarianceThreshold,
                                        f_regression, mutual_info_regression,
                                        r_regression)
 from sklearn.preprocessing import StandardScaler
-
-from load_data import loadData
 
 """
 ------------------------------------------------------------------------------------
@@ -101,7 +100,7 @@ def show_desriptors(name, num=None):
     number = 3
     dragon1 = descrSelect(scaler(X), y, method=f_regression, num=number)
     dragon2 = descrSelect(scaler(X), y, method=r_regression, num=number)
-    mi = mutual_info_regression(X, y, n_neighbors=5, random_state=42)
+    mi = mutual_info_regression(scaler(X), y, n_neighbors=5, random_state=42)
     mutual_info = pd.Series(mi)
     mutual_info.index = X.columns
     mutual_info.sort_values(ascending=False, inplace=True)
