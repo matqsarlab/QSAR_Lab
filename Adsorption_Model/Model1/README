@@ -51,10 +51,10 @@ Opis:
     r_regression) algorytm 6 znaczacych deskryptorow (po trzy na kazdy test).
     W celu zawezenia liczby deskryptorow z testu mutual_info_regression wybrane
     zostaly 3 najbardziej znaczace. Otrzymano 9 nastepujacych deskryptorow:
-    'BLTD48', 'ECC', 'ESOL', 'MW', 'O%', 'UNIP'. Z racji, ze `BLTD48` nie ma
-    racjonalnej interpretacji w kontekscie adsorpcji, zostal on odrzucony ze 
-    zbioru. Dodatkowo zostala podjeta decyzja o usrednieniu dwoch deksyrptorow
-    opisujacych oddzialywanie NM z wertykalnie ustawionym dipolem elektrycznym
+    'BLTD48', 'ECC', 'ESOL', 'Hamaker', 'MW', 'O%', 'SAtot', 'Si', 'UNIP'. Z racji, 
+    ze `BLTD48` nie ma racjonalnej interpretacji w kontekscie adsorpcji, zostal 
+    on odrzucony ze zbioru. Dodatkowo zostala podjeta decyzja o usrednieniu dwoch 
+    deksyrptorow opisujacych oddzialywanie NM z wertykalnie ustawionym dipolem elektrycznym
     w dwoch roznych orientacjach. Tym samym z dwoch deksryptorow (FDV) powstal
     jeden usredniony deskryptor FDV_mean, co jednoczesnie zredukowalo liczebnosc
     deskryptorow.
@@ -132,6 +132,21 @@ Opis modelu:
   Rtrain^2 = 0.87
   Rtest^2  = 0.72
   Rcv^2    = 0.73
+ ______________________________________________________ 
+
+                      Parametry
+ _______________________Modelu_________________________ 
+ n_estimators = 21
+ max_depth    = 3 
+ estimator    = DecisionTreeRegressor
+ loss func.   = linear 
+ random_state = 390
+
+### Cross-Validation ###
+ShuffleSplit
+n_splits      = 5
+test_size     = 0.25
+random_state  = 4759
  ______________________________________________________ 
 
   Model oparty o algorytm AdaBoost. Pojedynczym estymatorem jest
