@@ -4,35 +4,34 @@ import os
 
 import numpy as np
 
-from QSAR_Lab.Space_Tools.Align_two_3D_object import (AA_add_transpose,
-                                                      NM_translate)
+from QSAR_Lab.Space_Tools.Align_two_3D_object import (Structure1_translate,
+                                                      Structure2_add_rotate)
 
 parser = argparse.ArgumentParser(
     description="""
-    Create XYZ files build from 2 structures (s1, s2). Automatically rotate and translate objects to each other (rotation matrix from 
-    quaternions). Program can be use with flag -all then you direct list with structures 1 (s1) and list with structures 2 (s2) - automatically 
-    create main directories -> sub_directories (by structures 1) -> sub_sub_directories (by structures 2).
-
-    Dodaje do struktury roznie zorientowane dipole elektryczne.
+    Creates an *.xyz files made up of two structures (s1, s2). Automatically rotate and translate objects to each other (`rotation matrix` from 
+    quaternions script). Program can be use with flag -all then you direct list with structures 1 (s1) and structure 2 (s2 dipole.xyz) - automatically 
+    create main directories -> sub_directories (by structures 1) ->  *.xyz files with dipole (4 configurations: vertical, horizontal, vertical2, 
+    horizontal2). Additionally creates file with informations about atoms range in new `*.xyz` structure (`atom_info` file).
     """,
-    epilog="""Example: --> ./make_XYZ.py -s1 dir1/*.xyz -s2 dir2/*.xyz -all,  
-    --> ./make_XYZ.py -s1 s1.xyz -s2 s2.xyz""",
+    epilog="""Example: --> ./make_charge.py -s1 dir1/*.xyz -s2 dipole_name.xyz -all,  
+    --> ./make_charge.py -s1 s1.xyz -s2 dipole_name.xyz""",
 )
 parser.add_argument(
     "-s1",
     nargs="+",
-    help="structures 1 - can be either only one specific structures or path to structures",
+    help="structures 1 - can be either only one specific structures or path to *.xyz structures",
 )
 parser.add_argument(
     "-s2",
     nargs="+",
-    help="structures 2 - can be either only one specific structures or path to structures",
+    help="structures 2 - dipole *.xyz structure",
 )
 parser.add_argument(
     "-all",
     action="store_true",
-    help="""if active; its work on lists of structures and automatically create directories with sub_directories if not; 
-    its based on one structers 1 and one structures 2 then printing""",
+    help="""if active; it works on lists of structures and automatically create directories with sub_directories if not; 
+    it based on one structers 1 and one structures 2 then print""",
 )
 
 options = parser.parse_args()
@@ -57,14 +56,19 @@ if options.all:
 
     def atom_info(xyz1, xyz2):
         with open(os.path.join(dir, sub_dir1, f"atom_info"), "w") as f:
+            f.write(
+                """### Informations about range of atoms in *xyz file
+### First line  - structer's 1
+### Second line - structer's 2\n"""
+            )
             f.write(sub_dir1 + f"=1-{len(xyz1)}\n")
             f.write(sub_dir2 + f"={1+len(xyz1)}-{len(xyz2)}\n")
         return 1
 
-    dir = input("Wrpowadz nazwe katalogu lub wcisnij ENTER: ")
+    dir = input("Type the directory name or press Enter: ")
 
     if dir == "":
-        dir = "New_XYZ_structers"
+        dir = "xyz_files"
 
     path = str()
 
@@ -73,10 +77,10 @@ if options.all:
 
     for i in options.s1:
         for j in options.s2:
-            obj1 = NM_translate(i)
+            obj1 = Structure1_translate(i)
             xyz_obj1 = obj1.translate_center_to_zero
 
-            obj2 = AA_add_transpose(i, j)
+            obj2 = Structure2_add_rotate(i, j)
             xyz_obj2 = obj2.rotate_2D_object
             name = np.append(obj1.get_name, obj2.get_name)
 
@@ -98,9 +102,9 @@ if options.all:
             if "/" in i or j:
                 path = i.split("/")[-1].replace(".xyz", "") + "_" + j.split("/")[-1]
 
-            path_rotated = path.replace(".xyz", "_rotated.xyz")
+            path_rotated = path.replace(".xyz", "_vertical.xyz")
             path_horizontal = path.replace(".xyz", "_horizontal.xyz")
-            path_vertcial = path.replace(".xyz", "_vertcial.xyz")
+            path_vertcial = path.replace(".xyz", "_vertical2.xyz")
             path_horizontal2 = path.replace(".xyz", "_horizontal2.xyz")
 
             save(xyz_rotated, path_rotated)
@@ -116,10 +120,10 @@ else:
     except:
         print("Can't find an argument (Gaussian log file).")
     else:
-        obj1 = NM_translate(fname1)
+        obj1 = Structure1_translate(fname1)
         xyz_obj1 = obj1.translate_center_to_zero
 
-        obj2 = AA_add_transpose(fname1, fname2)
+        obj2 = Structure2_add_rotate(fname1, fname2)
         xyz_obj2 = obj2.rotate_2D_object
         name = np.append(obj1.get_name, obj2.get_name)
 
