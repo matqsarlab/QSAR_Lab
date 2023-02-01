@@ -262,9 +262,9 @@ class CoreModel:
             mean_tp_test.append(tp)
             mean_accuracy_test.append(a_test)
             mean_precision_test.append(
-                precision_score(y_test, y_test_pred, average="macro")
+                precision_score(y_test, y_test_pred, average="binary")
             )
-            mean_recall_test.append(recall_score(y_test, y_test_pred, average="micro"))
+            mean_recall_test.append(recall_score(y_test, y_test_pred, average="binary"))
 
         print("TRAIN SET:")
         print(f"Accuracy = {np.mean(mean_accuracy_train)}")
