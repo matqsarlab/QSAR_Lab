@@ -6,7 +6,10 @@ import pandas as pd
 def split_x_to_n(X, y, n=3, sort=True):
     def sortV(X, y):
         df = pd.concat([X, y], axis=1)
-        name = y.columns[0]
+        if type(y) is pd.Series:
+            name = y.name
+        else:
+            name = y.columns[0]
         df.sort_values(by=name, inplace=True)
         return df
 

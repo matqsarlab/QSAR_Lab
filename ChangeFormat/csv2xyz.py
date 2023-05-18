@@ -3,13 +3,6 @@ import os
 import numpy as np
 import pandas as pd
 
-path = "../<Name-To-Directory>"
-list_paths = []
-for (dirpath, dirnames, filenames) in os.walk(path):
-    for filename in filenames:
-        if filename.endswith(".csv"):
-            list_paths.append(os.sep.join([dirpath, filename]))
-
 
 def writer_xyz(func):
     def wrapper(*args):
