@@ -1,7 +1,3 @@
-#!/usr/bin/env python
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
 from matplotlib.patches import FancyArrowPatch
 from mpl_toolkits.mplot3d import Axes3D, proj3d
 

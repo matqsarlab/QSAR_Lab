@@ -4,7 +4,7 @@ from numpy.linalg import matrix_power
 from sklearn.preprocessing import StandardScaler
 
 
-def Williams_plot(X_train, X_test,y_train, y_test, y_train_pred, y_test_pred):
+def Williams_plot(X_train, X_test, y_train, y_test, y_train_pred, y_test_pred):
     """Aplicability Domain"""
     Xt = X_train
     Yt = y_train
@@ -27,12 +27,12 @@ def Williams_plot(X_train, X_test,y_train, y_test, y_train_pred, y_test_pred):
     res = np.zeros(len(Yt))
 
     for x in range(0, len(Yt)):
-        res[x] += np.array(Yt)[x]-XT_y_pred[x]
+        res[x] += np.array(Yt)[x] - XT_y_pred[x]
 
     scaler3 = StandardScaler()
     r = res.reshape(-1, 1)
     st_res = scaler3.fit_transform(r)
-    h_k = (3 * (len(Xt.columns) + 1))/len(Xt.index)
+    h_k = (3 * (len(Xt.columns) + 1)) / len(Xt.index)
     print("h_k =", h_k)
     """Train"""
 
@@ -46,7 +46,7 @@ def Williams_plot(X_train, X_test,y_train, y_test, y_train_pred, y_test_pred):
     res_v = np.zeros(len(Yv))
 
     for x in range(0, len(Yv)):
-        res_v[x] += np.array(Yv)[x]-XV_y_pred[x]
+        res_v[x] += np.array(Yv)[x] - XV_y_pred[x]
         pass
 
     st_res_v = scaler3.transform(res_v.reshape(-1, 1))

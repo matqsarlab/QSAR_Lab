@@ -14,8 +14,9 @@ def split_x_to_n(X, y, n=3, sort=True):
         return df
 
     if sort == True:
-        X = sortV(X=X, y=y).iloc[:, :-1]
-        y = sortV(X=X, y=y).iloc[:, -1]
+        data = sortV(X=X, y=y)
+        X = data.iloc[:, :-1]
+        y = data.iloc[:, -1]
     lenght = len(X)
     train = []
     test = []
