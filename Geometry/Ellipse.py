@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def ellipse(xy: tuple, a, b, rotate_angle):
+def ellipse(xy: tuple, a, b, rotate_angle=0):
     """xy - center
     a,b - diagonal of the ellipse
     rotate_angle - rotation angle in degree
